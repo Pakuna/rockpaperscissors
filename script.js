@@ -2,7 +2,9 @@ $("#options img").on("click", function() {
     $(this).addClass("active").siblings().removeClass("active");
 });
 
-const oLink = $("#board input");
+const oLink = $("#board input"),
+      oNewGameBtn = $("#board #new_game")
+      oLoading = $("#board #loading");
 let sGameId = null;
 
 oLink.on("focus", function() {
@@ -10,32 +12,35 @@ oLink.on("focus", function() {
     document.execCommand("copy");
 });
 
+// Start new game
+$("#new_game").click(function() {
+    oNewGameBtn.hide();
+    oLoading.show();
+    $.getJSON("ajax.php?a=start_game", function(oJson) {
+        oLoading.hide();
+        oLink.val("localhost:333/#" + oJson.id).show();
+        //history.pushState(null, null, "#" + oJson.id);
+    });
+});
+
 // Join existing game
 if (window.location.hash) {
     sGameId = window.location.hash.slice(1);
-    joinGame(sGameId);
-}
-// Start new game
-else {
-    sGameId = Math.random().toString(36).slice(2);
-    oLink.val("localhost:333/#" + sGameId).show();
-    startGame(sGameId);
-}
-
-function startGame(sGameId) {
-    $.getJSON("ajax.php", {
-        a: "start_game",
+    oNewGameBtn.hide();
+    oLoading.show();
+    $.getJSON("ajax.php?a=join_game", {
         gid: sGameId
-    }, function(sReturn) {
-        console.log(sReturn);
+    }, function(oJson) {
+        switch (parseInt(oJson.code)) {
+            case 1: // Owner joined, second player missing
+                oLoading.hide();
+                oLink.val("localhost:333/#" + sGameId ).show();
+                break;
+        }
+        console.log(oJson);
     });
 }
 
-function joinGame(sGameId) {
-    $.getJSON("ajax.php", {
-        a: "join_game",
-        gid: sGameId
-    }, function(sReturn) {
-        console.log(sReturn);
-    });
+function getGameState() {
+
 }

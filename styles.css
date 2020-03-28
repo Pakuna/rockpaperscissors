@@ -7,6 +7,12 @@ body {
     margin: 0 auto;
 }
 
+.btn {
+    width: 25vw;
+    max-width: 100px;
+    cursor: pointer;
+}
+
 #options {
     position: fixed;
     text-align: center;
@@ -16,11 +22,8 @@ body {
 }
 
 #options img {
-    width: 25vw;
     transition: 0.2s;
     vertical-align: top;
-    max-width: 100px;
-    cursor: pointer;
 }
 #options img.active {
     width: 30vw;
@@ -30,6 +33,20 @@ body {
 #board {
     text-align: center;
     margin-top: 50vh;
+}
+#board #new_game {
+    display: inline-block;
+    margin-top: 10vh;
+}
+@keyframes spin {
+    100% {
+        transform:rotate(360deg);
+    }
+}
+#board #loading {
+    animation: spin 3s linear infinite;
+    display: none;
+    margin-top: 10vh;
 }
 #board input {
     margin: 0 auto;

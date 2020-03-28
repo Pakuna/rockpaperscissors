@@ -2,20 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rock paper scissors</title>
-    <link rel="shortcut icon" href="img/icon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div id="options">
-        <img src="img/rock.svg">
-        <img src="img/paper.svg">
-        <img src="img/scissors.svg">
+        <img data-option="rock" class="btn" src="img/rock.svg">
+        <img data-option="paper" class="btn" src="img/paper.svg">
+        <img data-option="scissors" class="btn" src="img/scissors.svg">
     </div>
     <div id="board">
-        <input type="text" value="/#unique_code">
+        <input type="text" value="">
+        <img id="new_game" class="btn" src="img/add.svg">
+        <img id="loading" class="btn" src="img/spinner.svg">
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
