@@ -31,7 +31,7 @@ $("#new_game").click(function() {
     $.getJSON("ajax.php?a=start_game", function(oJson) {
         sGameId = oJson.id;
         oLoading.hide();
-        oLink.val("localhost:333/#" + sGameId).show();
+        oLink.val(location.host + "/#" + sGameId).show();
         history.pushState(null, null, "#" + sGameId);
         waitForPlayer(sGameId);
     });
@@ -67,7 +67,7 @@ if (window.location.hash) {
         // Second player still missing
         if (iCode == 1) {
             oLoading.hide();
-            oLink.val("localhost:333/#" + sGameId).show();
+            oLink.val(location.host + "/#" + sGameId).show();
             waitForPlayer(sGameId);
         }
     });
