@@ -2,10 +2,10 @@ const oOptions      = $("#options [data-option]"), // Options the user can choos
       oChoices      = $("#board [data-option]"), // Options the opponent selected
       oLink         = $("#board input"), // Link to copy and share
       oNewGameBtn   = $("#board #new_game"),
-      oLoading      = $("#board #loading"), // Loading animation
-      oPolling      = null; // Timeout handler while polling for game result
+      oLoading      = $("#board #loading"); // Loading animation
 
-let sGameId = null;
+let sGameId         = null, // The current game id
+    oPolling        = null; // Timeout handler while polling for game result
 
 // Sends users choice
 oOptions.on("click", function() {
@@ -22,6 +22,10 @@ oLink.on("focus", function() {
     document.execCommand("copy");
 });
 
+function getGameLink(sGameId) {
+    return location.host + location.pathname + "#" + sGameId;
+}
+
 // Start new game
 $("#new_game").click(function() {
     // Replace new game button with loading animation
@@ -31,7 +35,7 @@ $("#new_game").click(function() {
     $.getJSON("ajax.php?a=start_game", function(oJson) {
         sGameId = oJson.id;
         oLoading.hide();
-        oLink.val(location.host + "/#" + sGameId).show();
+        oLink.val(getGameLink(sGameId)).show();
         history.pushState(null, null, "#" + sGameId);
         waitForPlayer(sGameId);
     });
@@ -67,7 +71,7 @@ if (window.location.hash) {
         // Second player still missing
         if (iCode == 1) {
             oLoading.hide();
-            oLink.val(location.host + "/#" + sGameId).show();
+            oLink.val(getGameLink(sGameId)).show();
             waitForPlayer(sGameId);
         }
     });
