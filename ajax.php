@@ -25,7 +25,36 @@ function join_game() {
 
     $oGame = new Game($sGameId);
     $iReturn = $oGame->join();
-    echo json_encode(["code" => $iReturn]); die;
+    echo json_encode([
+        "code"      => $iReturn,
+        "choice"    => $oGame->getChoice()
+    ]); die;
+}
+
+function poll_game() {
+    $sGameId = $_GET["gid"] ?? null;
+    if (!$sGameId) die;
+
+    $oGame = new Game($sGameId);
+    echo json_encode(["choice" => $oGame->getOpponentChoice()]); die;
+}
+
+function update_game() {
+    $sGameId = $_GET["gid"] ?? null;
+    if (!$sGameId) die;
+
+    $sChoice = $_GET["c"] ?? null;
+    $oGame = new Game($sGameId);
+    $oGame->choose($sChoice);
+    echo json_encode(["choice" => $sChoice]); die;
+}
+
+function reset_game() {
+    $sGameId = $_GET["gid"] ?? null;
+    if (!$sGameId) die;
+
+    $oGame = new Game($sGameId);
+    echo json_encode(["reset" => $oGame->resetChoices()]); die;
 }
 
 function remove_old_games() {

@@ -13,7 +13,11 @@ class Game {
 
     function __construct(?string $sId = null) {
         // Set initial timestamp
-        $this->data["created"] = date("Y-m-d H:i:s");
+        $this->data = [
+            "owner_choice"  => null,
+            "player_choice" => null,
+            "created"       => date("Y-m-d H:i:s")
+        ];
 
         if ($sId) $this->load($sId);
     }
@@ -50,22 +54,21 @@ class Game {
         // No game? Can't join
         if (!$this->id) return self::ERROR_NO_GAME;
 
-        $sSessionId = session_id();
-        $sOwner = $this->data["owner"];
+        $sRole = $this->_getRole();
         $sPlayer = $this->data["player"];
 
         // You the owner?
-        if ($sOwner == $sSessionId) {
+        if ($sRole == "owner") {
             if ($sPlayer) return self::SUCCESS_OWNER_JOINED;
             return self::SUCCESS_OWNER_JOINED_PLAYER_MISSING;
         }
 
         // Second player already occupied?
-        if ($sPlayer == $sSessionId) return self::SUCCESS_PLAYER_JOINED;
+        if ($sRole == "player") return self::SUCCESS_PLAYER_JOINED;
         if ($sPlayer) return self::ERROR_GAME_FULL;
 
         // Set second player
-        $this->data["player"] = $sSessionId;
+        $this->data["player"] = session_id();
         $this->save();
         return self::SUCCESS_PLAYER_JOINED;
     }
@@ -73,13 +76,13 @@ class Game {
     /**
      * Stores game data to JSON file
      */
-    function save() {
+    function save() : bool {
         $sGamePath = $this->getPath($this->id);
         $this->data["modified"] = date("Y-m-d H:i:s");
         return file_put_contents(
             $sGamePath,
             json_encode($this->data, JSON_PRETTY_PRINT)
-        );
+        ) > 0;
     }
 
     /**
@@ -106,5 +109,71 @@ class Game {
     function remove() : bool {
         $sGamePath = $this->getPath($this->id);
         return @unlink($sGamePath);
+    }
+
+    function choose($sChoice) {
+        if (!in_array($sChoice, ["rock", "paper", "scissors"])) return false;
+
+        $sRole = $this->_getRole();
+        if (!$sRole) return false;
+
+        // You the owner?
+        if ($sRole == "owner") {
+            $this->data["owner_choice"] = $sChoice;
+        }
+        // You the player?
+        else if ($sRole == "player") {
+            $this->data["player_choice"] = $sChoice;
+        }
+
+        return $this->save();
+    }
+
+    function getChoice() {
+        $sRole = $this->_getRole();
+        if (!$sRole) return false;
+
+        // You the owner?
+        if ($sRole == "owner") {
+            return $this->data["owner_choice"];
+        }
+        // You the player?
+        if ($sRole == "player") {
+            return $this->data["player_choice"];
+        }
+    }
+
+    function getOpponentChoice() {
+        $sRole = $this->_getRole();
+
+        // You the owner?
+        if ($sRole == "owner" && $this->data["owner_choice"]) {
+            if (!$this->data["player"]) return null; // No opponent
+            return $this->data["player_choice"];
+        }
+
+        // You the player?
+        if ($sRole == "player" && $this->data["player_choice"]) {
+            return $this->data["owner_choice"];
+        }
+
+        return null;
+    }
+
+    function resetChoices() {
+        $sRole = $this->_getRole();
+        if (!$sRole) return false;
+
+        $this->data["owner_choice"] = $this->data["player_choice"] = null;
+        return $this->save();
+    }
+
+    private function _getRole() {
+        $sSessionId = session_id();
+        $sOwner = $this->data["owner"];
+        $sPlayer = $this->data["player"];
+
+        if ($sOwner == $sSessionId) return "owner";
+        if ($sPlayer == $sSessionId) return "player";
     }
 }

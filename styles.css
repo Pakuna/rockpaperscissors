@@ -63,3 +63,17 @@ body {
     background-color: rgb(50,50,50);
     display: none;
 }
+
+#board [data-option] {
+    cursor: default;
+    width: 0;
+    height: 0;
+    transition: 1s;
+    margin-top: 10vh;
+    opacity: 0;
+}
+#board [data-option].active {
+    width: inherit;
+    height: inherit;
+    opacity: 1;
+}
